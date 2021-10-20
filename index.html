@@ -24,7 +24,7 @@
         </canvas>
 
     </center>
-    
+
     <script type="text/javascript">
 
 
@@ -33,11 +33,16 @@
         var color = null;
         var figura = 1;
         var ispressed = false
-        var globalx = 0;
-        var globaly = 0;
+        var globalx = 20;
+        var globaly = 20;
         var dir = "derecha";
         var speed = 5
-        var lastPress =68
+        var lastPress = 68
+        var player = null;
+        var target = null;
+        var score = 0;
+        
+
 
 
         function paint(ctx) {
@@ -48,10 +53,12 @@
             ctx.fillRect(0, 0, 500, 500);
             ctx.closePath()
 
-            ctx.beginPath()
-            ctx.fillStyle = "red"
-            ctx.fillRect(globalx, globaly, 50, 50)
-            ctx.closePath()
+
+
+            player.fill(ctx)
+            target.fill(ctx)
+            ctx.font = "20px Arial"
+            ctx.fillText("Score: "+score,10,20)
 
         }
 
@@ -62,17 +69,23 @@
             if (lastPress == 37 || lastPress == 65) dir = "izquierda"
             if (lastPress == 38 || lastPress == 87) dir = "arriba"
             if (lastPress == 40 || lastPress == 83) dir = "abajo"
+            player.x
+            if (dir == "derecha") player.x += speed
+            if (dir == "izquierda") player.x -= speed
+            if (dir == "arriba") player.y -= speed
+            if (dir == "abajo") player.y += speed
 
-           
-            if (dir == "derecha") globalx += speed
-            if (dir == "izquierda") globalx -= speed
-            if (dir == "arriba") globaly -= speed
-            if (dir == "abajo") globaly += speed
+            if (player.x > 500) player.x = 0;
+            if (player.y > 500) player.y = 0;
+            if (player.x < 0) player.x = 500;
+            if (player.y < 0) player.y = 500;
 
-            if( globalx > 450 )globalx = 0;
-            if( globaly > 450 )globaly = 0;
-            if( globalx <0 )globalx = 450;
-            if( globaly <0 )globaly = 450;
+            if(player.touch(target)){
+                target.x = Math.random() * (480 - 20 ),20
+                target.y = Math.random() * (480 - 20 ),20
+                score +=10;
+                speed +=5
+            }
 
 
             paint(ctx)
@@ -82,6 +95,9 @@
         function run() {
             canvas = document.getElementById('mycanvas');
             ctx = canvas.getContext('2d')
+            player = new cuadrado(globalx, globaly, 20, 20, "red")
+            target = new cuadrado(250, 250, 20, 20, "blue")
+
             update()
 
 
@@ -129,6 +145,37 @@
                     window.setTimeout(callback, 17);
                 };
         }());
+
+        function cuadrado(x, y, w, h, c) {
+
+            //atributos
+            this.x = x
+            this.y = y
+            this.w = w
+            this.h = h
+            this.c = c
+
+            this.fill = function (ctx) {
+                ctx.fillStyle = this.c
+                ctx.fillRect(this.x, this.y, this.w, this.h)
+
+            }
+
+            this.touch = function(cuadro) {
+				
+				if( this.x < cuadro.x + cuadro.w &&
+					this.y < cuadro.y + cuadro.h && 
+
+					this.x + this.w > cuadro.x && 
+					this.y + this.h > cuadro.y ){
+
+					return true;
+				}
+
+				return false;
+			}
+        }
+
     </script>
 
 </body>
